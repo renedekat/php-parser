@@ -233,7 +233,7 @@ import (
 
 %type <token> reserved_non_modifiers
 %type <token> semi_reserved
-%type <token> identifier identifier_ex
+%type <token> identifier identifier_ex class_const_name
 %type <token> plain_variable optional_plain_variable
 %type <token> optional_comma
 %type <token> case_separator
@@ -352,6 +352,11 @@ identifier:
 identifier_ex:
         identifier      { $$ = $1 }
     |   semi_reserved   { $$ = $1 }
+;
+
+class_const_name:
+        identifier_ex   { $$ = $1 }
+    |   T_AS {$$=$1} | T_DO {$$=$1}
 ;
 
 optional_comma:
@@ -1763,7 +1768,7 @@ class_const_declaration:
 ;
 
 class_const_decl:
-        identifier_ex '=' expr backup_doc_comment
+        class_const_name '=' expr backup_doc_comment
             {
                 $$ = &ast.StmtConstant{
                     Position: yylex.(*Parser).builder.Pos.NewTokenNodePosition($1, $3),
